@@ -1,70 +1,76 @@
-from uuid import uuid4
-from datetime import datetime
+from uuid import UUID
+
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ticket import Ticket
-from app.schemas.ticket import CreateTicketRequest
+from app.schemas.ticket import CreateTicketRequest, UpdateTicketRequest
 
-tickets: list[Ticket] = []
 
-def create_ticket(data: CreateTicketRequest):
+async def create_ticket(
+    data: CreateTicketRequest,
+    db: AsyncSession,
+):
     ticket = Ticket(
-        id=uuid4(),
         title=data.title,
         priority=data.priority,
         status="open",
-        created_at=datetime.now(),
     )
 
-    tickets.append(ticket)
+    db.add(ticket)
+    await db.commit()
+    await db.refresh(ticket)
 
     return ticket
 
-from typing import Optional
+
+async def get_all(db: AsyncSession):
+    result = await db.execute(select(Ticket))
+    return result.scalars().all()
 
 
-def get_all():  
-    result = tickets
-    return result
+async def get_ticket(
+    ticket_id: UUID,
+    db: AsyncSession,
+):
+    result = await db.execute(
+        select(Ticket).where(Ticket.id == ticket_id)
+    )
 
-def get_ticket(ticket_id: str) -> Ticket | None:
-    for ticket in tickets:
-        if str(ticket.id) == ticket_id:
-            return ticket
-
-    return None
-
-from app.schemas.ticket import UpdateTicketRequest
+    return result.scalar_one_or_none()
 
 
-def update_ticket(
-    ticket_id: str,
+async def update_ticket(
+    ticket_id: UUID,
     data: UpdateTicketRequest,
-) -> Ticket | None:
-
-    ticket = get_ticket(ticket_id)
+    db: AsyncSession,
+):
+    ticket = await get_ticket(ticket_id, db)
 
     if ticket is None:
         return None
 
     updates = data.model_dump(exclude_unset=True)
 
-    if "title" in updates:
-        ticket.title = updates["title"]
+    for key, value in updates.items():
+        setattr(ticket, key, value)
 
-    if "priority" in updates:
-        ticket.priority = updates["priority"]
-
-    if "status" in updates:
-        ticket.status = updates["status"]
+    await db.commit()
+    await db.refresh(ticket)
 
     return ticket
 
-def delete_ticket(ticket_id: str) -> bool:
-    ticket = get_ticket(ticket_id)
+
+async def delete_ticket(
+    ticket_id: UUID,
+    db: AsyncSession,
+):
+    ticket = await get_ticket(ticket_id, db)
 
     if ticket is None:
         return False
 
-    tickets.remove(ticket)
+    await db.delete(ticket)
+    await db.commit()
 
     return True
