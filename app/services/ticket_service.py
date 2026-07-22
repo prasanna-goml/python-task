@@ -15,6 +15,7 @@ async def create_ticket(
         title=data.title,
         priority=data.priority,
         status="open",
+        assignee=data.assignee
     )
 
     db.add(ticket)

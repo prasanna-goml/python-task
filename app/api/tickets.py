@@ -3,6 +3,8 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from app.core.exceptions import TicketNotFoundError
+
 
 from app.core.deps import get_db
 from app.schemas.ticket import (
@@ -18,7 +20,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=TicketResponse)
+@router.post("", response_model=TicketResponse)
 async def create_ticket(
     ticket: CreateTicketRequest,
     db: AsyncSession = Depends(get_db),
@@ -26,7 +28,7 @@ async def create_ticket(
     return await ticket_service.create_ticket(ticket, db)
 
 
-@router.get("/", response_model=list[TicketResponse])
+@router.get("", response_model=list[TicketResponse])
 async def get_tickets(
     db: AsyncSession = Depends(get_db),
 ):
@@ -41,7 +43,7 @@ async def get_ticket(
     ticket = await ticket_service.get_ticket(ticket_id, db)
 
     if ticket is None:
-        raise HTTPException(status_code=404, detail="Ticket not found")
+        raise TicketNotFoundError(str(ticket_id))
 
     return ticket
 
@@ -55,7 +57,7 @@ async def update_ticket(
     ticket = await ticket_service.update_ticket(ticket_id, data, db)
 
     if ticket is None:
-        raise HTTPException(status_code=404, detail="Ticket not found")
+        raise TicketNotFoundError(str(ticket_id))
 
     return ticket
 
@@ -68,6 +70,6 @@ async def delete_ticket(
     deleted = await ticket_service.delete_ticket(ticket_id, db)
 
     if not deleted:
-        raise HTTPException(status_code=404, detail="Ticket not found")
+        raise TicketNotFoundError(str(ticket_id))
 
     return {"message": "Ticket deleted successfully"}

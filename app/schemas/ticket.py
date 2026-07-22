@@ -6,6 +6,7 @@ from pydantic import BaseModel, field_validator
 class CreateTicketRequest(BaseModel):
     title: str
     priority: Literal["low", "medium", "high"]
+    assignee: str | None = None
 
     @field_validator("title")
     @classmethod
@@ -49,5 +50,6 @@ class TicketResponse(BaseModel):
     title: str
     priority: Literal["low", "medium", "high"]
     status: Literal["open", "in_progress", "resolved"]
+    assignee: str | None
     created_at: datetime
 
