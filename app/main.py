@@ -1,12 +1,21 @@
 from contextlib import asynccontextmanager
-from app.api.tickets import router
-from app.core.database import create_tables
+from datetime import datetime
 import time
 
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from app.core.exceptions import TicketNotFoundError
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
+from app.api.tickets import router
+from app.api.ai import router as ai_router
+
+from app.core.database import create_tables
+from app.core.database import AsyncSessionLocal  # or see note below
+
+from app.core.exceptions import TicketNotFoundError
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -60,4 +69,54 @@ async def ticket_not_found_handler(
 async def health():
     return {"status": "ok"}
 
+@app.get(
+    "/ready",
+    tags=["Health"],
+    status_code=status.HTTP_200_OK,
+)
+async def ready():
+
+    checks = {}
+
+    try:
+        async with AsyncSessionLocal() as session:
+            await session.execute(text("SELECT 1"))
+
+        checks["database"] = "UP"
+
+        return {
+            "status": "READY",
+            "checks": checks,
+        }
+
+    except SQLAlchemyError:
+
+        checks["database"] = "DOWN"
+
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "status": "NOT_READY",
+                "checks": checks,
+            },
+        )
+from pyinstrument import Profiler
+from fastapi import Request
+
+@app.middleware("http")
+async def profile_requests(request: Request, call_next):
+    profiler = Profiler()
+    profiler.start()
+
+    response = await call_next(request)
+
+    profiler.stop()
+
+    print("\n" + "=" * 80)
+    print(f"{request.method} {request.url.path}")
+    print("=" * 80)
+    print(profiler.output_text(unicode=True, color=True))
+
+    return response
 app.include_router(router)
+app.include_router(ai_router)
