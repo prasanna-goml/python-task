@@ -1,0 +1,126 @@
+
+================================================================================
+GET /docs
+================================================================================
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 11:31:23  Samples:  2
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.003     CPU time: 0.016
+/   _/                      v5.1.2
+
+Profile at D:\office\Python day1\ai-service-desk\app\middleware\profiler.py:11
+
+0.002 NoneType._run  asyncio\events.py:78
+├─ 0.001 [self]  asyncio\events.py
+└─ 0.001 RequestResponseCycle.run_asgi  uvicorn\protocols\http\h11_impl.py:414
+      [4 frames hidden]  uvicorn, fastapi, starlette
+         0.001 BaseHTTPMiddleware.__call__  starlette\middleware\base.py:101
+         └─ 0.001 profile_requests  app\middleware\profiler.py:9
+            └─ 0.001 call_next  starlette\middleware\base.py:112
+                  [5 frames hidden]  anyio, typing, typing_extensions
+                     0.001 _has_generic_or_protocol_as_origin  typing_extensions.py:3281
+
+
+
+================================================================================
+GET /openapi.json
+================================================================================
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 11:31:23  Samples:  65
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.067     CPU time: 0.047
+/   _/                      v5.1.2
+
+Profile at D:\office\Python day1\ai-service-desk\app\middleware\profiler.py:11
+
+0.066 Handle._run  asyncio\events.py:78
+└─ 0.066 coro  starlette\middleware\base.py:139
+      [316 frames hidden]  starlette, fastapi, pydantic, copy, <...
+         0.001 BaseHTTPMiddleware.__call__  starlette\middleware\base.py:101
+         └─ 0.001 response_time_middleware  app\middleware\response_time.py:6
+            └─ 0.001 MutableHeaders.__setitem__  starlette\datastructures.py:578
+
+
+
+================================================================================
+GET /tickets
+================================================================================
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 11:31:28  Samples:  27
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.030     CPU time: 0.031
+/   _/                      v5.1.2
+
+Profile at D:\office\Python day1\ai-service-desk\app\middleware\profiler.py:11
+
+0.028 MainThread  <thread>:28168
+├─ 0.020 <module>  <string>:1
+│     [96 frames hidden]  multiprocessing, uvicorn, asyncio, st...
+│        0.002 run_endpoint_function  fastapi\routing.py:337
+│        └─ 0.002 get_tickets  app\api\tickets.py:31
+│           └─ 0.002 get_all  app\services\ticket_service.py:28
+│              └─ 0.002 AsyncSession.execute  sqlalchemy\ext\asyncio\session.py:423
+│                    [6 frames hidden]  sqlalchemy, asyncpg
+└─ 0.008 Session.execute  sqlalchemy\orm\session.py:2313
+      [66 frames hidden]  sqlalchemy, weakref, logging, <built-in>
+
+
+
+================================================================================
+POST /ai/summarize
+================================================================================
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 11:31:43  Samples:  51
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 4.569     CPU time: 0.750
+/   _/                      v5.1.2
+
+Profile at D:\office\Python day1\ai-service-desk\app\middleware\profiler.py:11
+
+4.569 Handle._run  asyncio\events.py:78
+└─ 4.566 coro  starlette\middleware\base.py:139
+      [18 frames hidden]  starlette, fastapi, anyio
+         4.547 AsyncIOBackend.run_sync_in_worker_thread  anyio\_backends\_asyncio.py:2582
+         └─ 4.546 [await]  anyio\_backends\_asyncio.py
+
+
+
+================================================================================
+GET /docs
+================================================================================
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 13:38:51  Samples:  6
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.007     CPU time: 0.016
+/   _/                      v5.1.2
+
+Profile at D:\office\Python day1\ai-service-desk\app\middleware\profiler.py:11
+
+0.006 Handle._run  asyncio\events.py:78
+├─ 0.003 coro  starlette\middleware\base.py:139
+│     [23 frames hidden]  starlette, fastapi, anyio, asyncio
+├─ 0.001 RequestResponseCycle.run_asgi  uvicorn\protocols\http\h11_impl.py:414
+│     [4 frames hidden]  uvicorn, fastapi, starlette
+│        0.001 BaseHTTPMiddleware.__call__  starlette\middleware\base.py:101
+│        └─ 0.001 profile_requests  app\middleware\profiler.py:9
+│           └─ 0.001 call_next  starlette\middleware\base.py:112
+│                 [4 frames hidden]  anyio, asyncio
+├─ 0.001 _WindowsSelectorEventLoop._accept_connection  asyncio\selector_events.py:154
+│     [2 frames hidden]  socket, <built-in>
+└─ 0.001 [self]  asyncio\events.py
+
+
+
+================================================================================
+GET /openapi.json
+================================================================================
+
+  _     ._   __/__   _ _  _  _ _/_   Recorded: 13:38:52  Samples:  154
+ /_//_/// /_\ / //_// / //_'/ //     Duration: 0.165     CPU time: 0.141
+/   _/                      v5.1.2
+
+Profile at D:\office\Python day1\ai-service-desk\app\middleware\profiler.py:11
+
+0.164 Handle._run  asyncio\events.py:78
+└─ 0.164 coro  starlette\middleware\base.py:139
+      [225 frames hidden]  starlette, fastapi, pydantic, re, <st...
+         0.002 BaseHTTPMiddleware.__call__  starlette\middleware\base.py:101
+         └─ 0.002 response_time_middleware  app\middleware\response_time.py:6
+            └─ 0.002 call_next  starlette\middleware\base.py:112
+
+

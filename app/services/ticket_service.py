@@ -1,9 +1,9 @@
 from uuid import UUID
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ticket import Ticket
+from app.repositories import ticket_repository
 from app.schemas.ticket import CreateTicketRequest, UpdateTicketRequest
 
 
@@ -15,30 +15,21 @@ async def create_ticket(
         title=data.title,
         priority=data.priority,
         status="open",
-        assignee=data.assignee
+        assignee=data.assignee,
     )
 
-    db.add(ticket)
-    await db.commit()
-    await db.refresh(ticket)
-
-    return ticket
+    return await ticket_repository.create(ticket, db)
 
 
 async def get_all(db: AsyncSession):
-    result = await db.execute(select(Ticket))
-    return result.scalars().all()
+    return await ticket_repository.get_all(db)
 
 
 async def get_ticket(
     ticket_id: UUID,
     db: AsyncSession,
 ):
-    result = await db.execute(
-        select(Ticket).where(Ticket.id == ticket_id)
-    )
-
-    return result.scalar_one_or_none()
+    return await ticket_repository.get_by_id(ticket_id, db)
 
 
 async def update_ticket(
@@ -46,7 +37,7 @@ async def update_ticket(
     data: UpdateTicketRequest,
     db: AsyncSession,
 ):
-    ticket = await get_ticket(ticket_id, db)
+    ticket = await ticket_repository.get_by_id(ticket_id, db)
 
     if ticket is None:
         return None
@@ -56,22 +47,17 @@ async def update_ticket(
     for key, value in updates.items():
         setattr(ticket, key, value)
 
-    await db.commit()
-    await db.refresh(ticket)
-
-    return ticket
+    return await ticket_repository.update(ticket, db)
 
 
 async def delete_ticket(
     ticket_id: UUID,
     db: AsyncSession,
 ):
-    ticket = await get_ticket(ticket_id, db)
+    ticket = await ticket_repository.get_by_id(ticket_id, db)
 
     if ticket is None:
         return False
 
-    await db.delete(ticket)
-    await db.commit()
-
+    await ticket_repository.delete(ticket, db)
     return True
