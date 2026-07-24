@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
  
 from app.schemas.ai import SummarizeRequest, SummarizeResponse
-from app.services.bedrock_service import (
+from app.services.aws.bedrock_service import (
     BedrockService,
     BedrockServiceError,
     FakeBedrockService,

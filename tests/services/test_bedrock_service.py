@@ -4,7 +4,7 @@ from unittest.mock import Mock
 import pytest
 from botocore.exceptions import ClientError
 
-from app.services.bedrock_service import (
+from app.services.aws.bedrock_service import (
     BedrockService,
     BedrockServiceError,
     FakeBedrockService,
